@@ -1,0 +1,11 @@
+version: "2.7"
+services:
+  db:
+    restart: always
+    image: postgres
+    container_name: postgres-container
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASS}
+    ports:
+      - 5432:5432
