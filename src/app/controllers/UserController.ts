@@ -1,9 +1,9 @@
 import { Request, Response } from 'express';
 import { z } from 'zod';
 
-import Hash from '../../helpers/Hash';
-import prisma from '../../services/prisma';
-import formatErrorMessage from '../../utils/formatErrorMessage';
+import Hash from '@helpers/Hash';
+import prisma from '@services/prisma';
+import formatErrorMessage from '@utils/formatErrorMessage';
 
 const storeSchema = z.object({
   name: z.string().min(2),
