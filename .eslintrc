@@ -13,5 +13,7 @@
     "sourceType": "module",
     "project": "./tsconfig.json"
   },
-  "rules": {}
+  "rules": {
+    "class-methods-use-this": "off"
+  }
 }
