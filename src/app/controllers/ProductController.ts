@@ -1,15 +1,9 @@
 import { Request, Response } from 'express';
-import z from 'zod';
 
 import ProductRepository from '@repositories/ProductRepository';
-import formatErrorMessage from '@utils/formatErrorMessage';
+import ProductSchema from '@schemas/ProductSchema';
 
-const storeSchema = z.object({
-  name: z.string().min(1),
-  price: z.number().min(1),
-  imageUrl: z.string().url(),
-  description: z.string().optional(),
-});
+import formatErrorMessage from '@utils/formatErrorMessage';
 
 class ProductController {
   async index(req: Request, res: Response) {
@@ -19,7 +13,7 @@ class ProductController {
   }
 
   async store(req: Request, res: Response) {
-    const validation = storeSchema.safeParse(req.body);
+    const validation = ProductSchema.safeParse(req.body);
 
     if (!validation.success) {
       return res.status(422).json({

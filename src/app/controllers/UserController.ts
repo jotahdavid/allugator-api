@@ -1,20 +1,14 @@
 import { Request, Response } from 'express';
-import { z } from 'zod';
 
+import UserSchema from '@schemas/UserSchema';
 import UserRepository from '@repositories/UserRepository';
 
 import Hash from '@helpers/Hash';
 import formatErrorMessage from '@utils/formatErrorMessage';
 
-const storeSchema = z.object({
-  name: z.string().min(2),
-  email: z.string().email(),
-  password: z.string().min(4),
-});
-
 class UserController {
   async store(req: Request, res: Response) {
-    const validation = storeSchema.safeParse(req.body);
+    const validation = UserSchema.safeParse(req.body);
 
     if (!validation.success) {
       return res.status(422).json({

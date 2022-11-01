@@ -32,6 +32,7 @@
     "paths": {
       "@controllers/*": ["app/controllers/*"],
       "@repositories/*": ["app/repositories/*"],
+      "@schemas/*": ["app/schemas/*"],
       "@helpers/*": ["helpers/*"],
       "@utils/*": ["utils/*"],
       "@services/*": ["services/*"],
