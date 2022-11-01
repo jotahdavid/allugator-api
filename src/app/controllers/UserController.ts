@@ -17,7 +17,7 @@ class UserController {
 
     if (!validation.success) {
       const validationError = fromZodError(validation.error, { maxIssuesInMessage: 2 });
-      return res.status(400).json({ error: validationError.message });
+      return res.status(422).json({ error: validationError.message });
     }
 
     const { data } = validation;
