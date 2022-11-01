@@ -1,9 +1,9 @@
 import { Request, Response } from 'express';
 import { z } from 'zod';
-import { fromZodError } from 'zod-validation-error';
 
 import Hash from '../../helpers/Hash';
 import prisma from '../../services/prisma';
+import formatErrorMessage from '../../utils/formatErrorMessage';
 
 const storeSchema = z.object({
   name: z.string().min(2),
@@ -16,8 +16,9 @@ class UserController {
     const validation = storeSchema.safeParse(req.body);
 
     if (!validation.success) {
-      const validationError = fromZodError(validation.error, { maxIssuesInMessage: 2 });
-      return res.status(422).json({ error: validationError.message });
+      return res.status(422).json({
+        error: formatErrorMessage(validation.error),
+      });
     }
 
     const { data } = validation;
