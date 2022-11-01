@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import z from 'zod';
 
-import prisma from '@services/prisma';
+import ProductRepository from '@repositories/ProductRepository';
 import formatErrorMessage from '@utils/formatErrorMessage';
 
 const storeSchema = z.object({
@@ -13,7 +13,7 @@ const storeSchema = z.object({
 
 class ProductController {
   async index(req: Request, res: Response) {
-    const products = await prisma.product.findMany();
+    const products = await ProductRepository.findAll();
 
     return res.json(products);
   }
@@ -27,8 +27,9 @@ class ProductController {
       });
     }
 
-    const newProduct = await prisma.product.create({
-      data: validation.data,
+    const newProduct = await ProductRepository.create({
+      ...validation.data,
+      description: validation.data.description ?? null,
     });
 
     return res.status(201).json(newProduct);
