@@ -1,8 +1,9 @@
 import { Request, Response } from 'express';
 import { z } from 'zod';
 
+import UserRepository from '@repositories/UserRepository';
+
 import Hash from '@helpers/Hash';
-import prisma from '@services/prisma';
 import formatErrorMessage from '@utils/formatErrorMessage';
 
 const storeSchema = z.object({
@@ -21,29 +22,16 @@ class UserController {
       });
     }
 
-    const { data } = validation;
-
-    const isEmailAlreadyInUse = await prisma.user.findUnique({
-      where: {
-        email: data.email,
-      },
-    });
+    const isEmailAlreadyInUse = await UserRepository.findByEmail(validation.data.email);
     if (isEmailAlreadyInUse) {
       return res.status(400).json({ error: 'This e-mail is already in use' });
     }
 
-    const passwordHashed = await Hash.make(data.password);
+    const passwordHashed = await Hash.make(validation.data.password);
 
-    const newUser = await prisma.user.create({
-      data: {
-        ...data,
-        password: passwordHashed,
-      },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-      },
+    const newUser = await UserRepository.create({
+      ...validation.data,
+      password: passwordHashed,
     });
 
     return res.status(201).json({ user: newUser });
