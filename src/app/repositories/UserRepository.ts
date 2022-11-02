@@ -10,11 +10,6 @@ class UserRepository {
       where: {
         email,
       },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-      },
     });
   }
 
