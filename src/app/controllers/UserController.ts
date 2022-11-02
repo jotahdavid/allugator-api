@@ -5,9 +5,12 @@ import UserSchema from '@schemas/UserSchema';
 import UserRepository from '@repositories/UserRepository';
 
 import Hash from '@helpers/Hash';
+import Token from '@helpers/Token';
 import formatErrorMessage from '@utils/formatErrorMessage';
 
 type ResponseAuthenticated<TBody = any> = Response<TBody, { user: User }>;
+
+const HOUR_IN_SECONDS = 3600;
 
 class UserController {
   async store(req: Request, res: Response) {
@@ -33,7 +36,13 @@ class UserController {
       password: passwordHashed,
     });
 
-    return res.status(201).json({ user: newUser });
+    const token = await Token.generate({
+      iss: 'allugator-api',
+      sub: newUser.id,
+      exp: Math.floor(Date.now() / 1000) + HOUR_IN_SECONDS * 4,
+    });
+
+    return res.status(201).json({ user: newUser, token });
   }
 
   async getByToken(req: Request, res: ResponseAuthenticated) {

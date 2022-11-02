@@ -41,7 +41,7 @@ class AuthController {
     const token = await Token.generate({
       iss: 'allugator-api',
       sub: user.id,
-      exp: Math.floor(Date.now() / 1000) + HOUR_IN_SECONDS,
+      exp: Math.floor(Date.now() / 1000) + HOUR_IN_SECONDS * 4,
     });
 
     return res.json({ user: userResponse, token });
