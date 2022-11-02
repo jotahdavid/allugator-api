@@ -5,6 +5,14 @@ import prisma from '@services/prisma';
 type NewUser = Omit<User, 'id' | 'createdAt'>;
 
 class UserRepository {
+  findById(id: string) {
+    return prisma.user.findUnique({
+      where: {
+        id,
+      },
+    });
+  }
+
   findByEmail(email: string) {
     return prisma.user.findUnique({
       where: {
