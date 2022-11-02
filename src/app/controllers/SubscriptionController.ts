@@ -46,6 +46,28 @@ class SubscriptionController {
       },
     });
   }
+
+  async getAllUserSubscriptions(req: Request, res: ResponseAuthenticated) {
+    const { user } = res.locals;
+
+    const subscriptions = await SubscriptionRepository.findAllByUserId(user.id);
+
+    const parsedSubscriptions = subscriptions.map((subscription) => {
+      const product = !subscription.product ? null : {
+        ...subscription.product,
+        createdAt: undefined,
+      };
+
+      return {
+        id: subscription.id,
+        price: subscription.price,
+        expiresAt: subscription.expiresAt,
+        product,
+      };
+    });
+
+    return res.json(parsedSubscriptions);
+  }
 }
 
 export default new SubscriptionController();

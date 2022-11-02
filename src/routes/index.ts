@@ -16,6 +16,7 @@ router.post('/users', UserController.store);
 
 router.get('/users/me', authMiddleware, UserController.getByToken);
 
+router.get('/users/me/subscriptions', authMiddleware, SubscriptionController.getAllUserSubscriptions);
 router.post('/users/me/subscriptions', authMiddleware, SubscriptionController.store);
 
 router.post('/auth/login', AuthController.login);
