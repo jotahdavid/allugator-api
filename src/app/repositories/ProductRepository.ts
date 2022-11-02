@@ -2,11 +2,20 @@ import { Product } from '@prisma/client';
 
 import prisma from '@services/prisma';
 
+export enum ProductOrderByField {
+  NAME = 'name',
+  PRICE = 'price',
+}
+
 type NewProduct = Omit<Product, 'id' | 'createdAt'>;
 
 class ProductRepository {
-  findAll() {
-    return prisma.product.findMany();
+  findAll(orderByField: ProductOrderByField, order: 'asc' | 'desc') {
+    return prisma.product.findMany({
+      orderBy: {
+        [orderByField]: order,
+      },
+    });
   }
 
   create(newProduct: NewProduct) {
