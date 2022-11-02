@@ -8,27 +8,25 @@ import formatErrorMessage from '@utils/formatErrorMessage';
 const isOrderByField = (value: any): value is ProductOrderByField => {
   const orderFields = Object.values(ProductOrderByField);
 
-  if (Array.isArray(value)) {
-    return orderFields.includes(value[0]);
-  }
-
   return orderFields.includes(value);
 };
 
-const isString = (value: unknown): value is string => typeof value === 'string';
+const getFirstValue = <T>(value: T | T[]) => (
+  Array.isArray(value) ? value[0] : value
+);
 
-const getOrderDirection = (value: unknown) => {
-  if (isString(value) && (value === 'asc' || value === 'desc')) {
-    return value;
-  }
-  return 'asc';
-};
+const getOrderDirection = (value: unknown): 'asc' | 'desc' => (
+  (value === 'asc' || value === 'desc') ? value : 'asc'
+);
 
 class ProductController {
   async index(req: Request, res: Response) {
-    const { orderBy, order } = req.query;
+    const { query } = req;
 
+    const orderBy = getFirstValue(query.orderBy);
     const orderByField = isOrderByField(orderBy) ? orderBy : ProductOrderByField.NAME;
+
+    const order = getFirstValue(query.order);
 
     const products = await ProductRepository.findAll(
       orderByField,
