@@ -20,12 +20,14 @@ class AuthController {
       });
     }
 
-    const user = await UserRepository.findByEmail(validation.data.email);
+    const payload = validation.data;
+
+    const user = await UserRepository.findByEmail(payload.email);
     if (!user) {
       return res.status(400).json({ error: 'E-mail or password are invalid' });
     }
 
-    const isTheSamePassword = await Hash.compare(validation.data.password, user.password);
+    const isTheSamePassword = await Hash.compare(payload.password, user.password);
     if (!isTheSamePassword) {
       return res.status(400).json({ error: 'E-mail or password are invalid' });
     }

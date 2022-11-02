@@ -16,15 +16,17 @@ class UserController {
       });
     }
 
-    const isEmailAlreadyInUse = await UserRepository.findByEmail(validation.data.email);
+    const payload = validation.data;
+
+    const isEmailAlreadyInUse = await UserRepository.findByEmail(payload.email);
     if (isEmailAlreadyInUse) {
       return res.status(400).json({ error: 'This e-mail is already in use' });
     }
 
-    const passwordHashed = await Hash.make(validation.data.password);
+    const passwordHashed = await Hash.make(payload.password);
 
     const newUser = await UserRepository.create({
-      ...validation.data,
+      ...payload,
       password: passwordHashed,
     });
 

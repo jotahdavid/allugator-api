@@ -45,9 +45,11 @@ class ProductController {
       });
     }
 
+    const payload = validation.data;
+
     const newProduct = await ProductRepository.create({
-      ...validation.data,
-      description: validation.data.description ?? null,
+      ...payload,
+      description: payload.description ?? null,
     });
 
     return res.status(201).json(newProduct);
