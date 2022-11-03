@@ -8,13 +8,15 @@ interface Payload extends JwtPayload {
   sub: string;
 }
 
+const { ADMIN_KEY } = process.env;
+
 function isValidPayload(payload: any): asserts payload is Payload {
   if (!(typeof payload === 'object' && 'sub' in payload && typeof payload.sub === 'string')) {
     throw new Error('Payload invalid');
   }
 }
 
-async function authMiddleware(req: Request, res: Response, next: NextFunction) {
+async function authUserMiddleware(req: Request, res: Response, next: NextFunction) {
   const authHeader = req.headers.authorization;
 
   if (!authHeader) {
@@ -42,6 +44,38 @@ async function authMiddleware(req: Request, res: Response, next: NextFunction) {
   }
 
   return next();
+}
+
+function authAdminMiddleware(req: Request, res: Response, next: NextFunction) {
+  if (!ADMIN_KEY) {
+    return res.sendStatus(404);
+  }
+
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader) {
+    return res.status(401).json({ error: 'Token was not provided' });
+  }
+
+  const [scheme, token] = authHeader.split(' ');
+
+  if (!/^Bearer$/i.test(scheme) || !token) {
+    return res.status(401).json({ error: 'Token malformatted' });
+  }
+
+  try {
+    if (ADMIN_KEY !== token) {
+      throw new Error('Token invalid');
+    }
+  } catch {
+    return res.status(401).json({ error: 'Token invalid' });
+  }
+
+  return next();
+}
+
+function authMiddleware(role: 'user' | 'admin') {
+  return role === 'admin' ? authAdminMiddleware : authUserMiddleware;
 }
 
 export default authMiddleware;

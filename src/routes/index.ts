@@ -10,14 +10,14 @@ import authMiddleware from '@middlewares/authMiddleware';
 const router = Router();
 
 router.get('/products', ProductController.index);
-router.post('/products', ProductController.store);
+router.post('/products', authMiddleware('admin'), ProductController.store);
 
 router.post('/users', UserController.store);
 
-router.get('/users/me', authMiddleware, UserController.getByToken);
+router.get('/users/me', authMiddleware('user'), UserController.getByToken);
 
-router.get('/users/me/subscriptions', authMiddleware, SubscriptionController.getAllUserSubscriptions);
-router.post('/users/me/subscriptions', authMiddleware, SubscriptionController.store);
+router.get('/users/me/subscriptions', authMiddleware('user'), SubscriptionController.getAllUserSubscriptions);
+router.post('/users/me/subscriptions', authMiddleware('user'), SubscriptionController.store);
 
 router.post('/auth/login', AuthController.login);
 
