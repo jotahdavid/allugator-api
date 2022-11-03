@@ -19,12 +19,9 @@ class SubscriptionController {
 
     const payload = validation.data;
 
-    const product = await ProductRepository.findById(payload.productId, true);
+    const product = await ProductRepository.findById(payload.productId);
     if (!product) {
       return res.status(404).json({ error: 'Product not exists' });
-    }
-    if (product.subscription) {
-      return res.status(400).json({ error: 'The product already has an active subscription' });
     }
 
     const { user } = res.locals;

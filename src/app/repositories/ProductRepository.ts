@@ -10,13 +10,13 @@ export enum ProductOrderByField {
 type NewProduct = Omit<Product, 'id' | 'createdAt'>;
 
 class ProductRepository {
-  findById(id: string, includeSubscription: boolean = false) {
+  findById(id: string, includeSubscriptions: boolean = false) {
     return prisma.product.findUnique({
       where: {
         id,
       },
       include: {
-        subscription: includeSubscription,
+        subscriptions: includeSubscriptions,
       },
     });
   }
