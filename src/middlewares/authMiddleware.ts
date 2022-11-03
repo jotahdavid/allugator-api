@@ -10,6 +10,24 @@ interface Payload extends JwtPayload {
 
 const { ADMIN_KEY } = process.env;
 
+class TokenError extends Error {}
+
+function getAuthHeaderToken(req: Request) {
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader) {
+    throw new TokenError('Token was not provided');
+  }
+
+  const [scheme, token] = authHeader.split(' ');
+
+  if (!/^Bearer$/i.test(scheme) || !token) {
+    throw new TokenError('Token malformatted');
+  }
+
+  return token;
+}
+
 function isValidPayload(payload: any): asserts payload is Payload {
   if (!(typeof payload === 'object' && 'sub' in payload && typeof payload.sub === 'string')) {
     throw new Error('Payload invalid');
@@ -17,30 +35,21 @@ function isValidPayload(payload: any): asserts payload is Payload {
 }
 
 async function authUserMiddleware(req: Request, res: Response, next: NextFunction) {
-  const authHeader = req.headers.authorization;
-
-  if (!authHeader) {
-    return res.status(401).json({ error: 'Token was not provided' });
-  }
-
-  const [scheme, token] = authHeader.split(' ');
-
-  if (!/^Bearer$/i.test(scheme) || !token) {
-    return res.status(401).json({ error: 'Token malformatted' });
-  }
-
   try {
+    const token = getAuthHeaderToken(req);
+
     const payload = await Token.verify(token);
     isValidPayload(payload);
 
     const user = await UserRepository.findById(payload.sub);
     if (!user) {
-      throw new Error('User doesn\'t exists');
+      throw new TokenError('Token invalid');
     }
 
     res.locals.user = user;
-  } catch {
-    return res.status(401).json({ error: 'Token invalid' });
+  } catch (err) {
+    const errorMessage = err instanceof TokenError ? err.message : 'Token invalid';
+    return res.status(401).json({ error: errorMessage });
   }
 
   return next();
@@ -51,24 +60,15 @@ function authAdminMiddleware(req: Request, res: Response, next: NextFunction) {
     return res.sendStatus(404);
   }
 
-  const authHeader = req.headers.authorization;
-
-  if (!authHeader) {
-    return res.status(401).json({ error: 'Token was not provided' });
-  }
-
-  const [scheme, token] = authHeader.split(' ');
-
-  if (!/^Bearer$/i.test(scheme) || !token) {
-    return res.status(401).json({ error: 'Token malformatted' });
-  }
-
   try {
+    const token = getAuthHeaderToken(req);
+
     if (ADMIN_KEY !== token) {
-      throw new Error('Token invalid');
+      throw new TokenError('Token invalid');
     }
-  } catch {
-    return res.status(401).json({ error: 'Token invalid' });
+  } catch (err) {
+    const errorMessage = err instanceof TokenError ? err.message : 'Token invalid';
+    return res.status(401).json({ error: errorMessage });
   }
 
   return next();
