@@ -9,6 +9,12 @@ import formatErrorMessage from '@utils/formatErrorMessage';
 
 type ResponseAuthenticated<TBody = any> = Response<TBody, { user: User }>;
 
+function getDateOneYearLater() {
+  const date = new Date();
+  date.setFullYear(date.getFullYear() + 1);
+  return date;
+}
+
 class SubscriptionController {
   async store(req: Request, res: ResponseAuthenticated) {
     const validation = SubscriptionSchema.safeParse(req.body);
@@ -25,9 +31,12 @@ class SubscriptionController {
     }
 
     const { user } = res.locals;
+
     const newSubscription = await SubscriptionRepository.create({
-      ...payload,
+      price: product.rentPrice,
+      productId: payload.productId,
       userId: user.id,
+      expiresAt: getDateOneYearLater(),
     });
 
     return res.json({
