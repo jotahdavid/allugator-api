@@ -11,6 +11,7 @@ const router = Router();
 
 router.get('/products', ProductController.index);
 router.post('/products', authMiddleware('admin'), ProductController.store);
+router.get('/products/:id', ProductController.show);
 
 router.post('/users', UserController.store);
 

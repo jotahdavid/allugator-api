@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { validate as validateUUID } from 'uuid';
 
 import ProductRepository, { ProductOrderByField } from '@repositories/ProductRepository';
 import ProductSchema from '@schemas/ProductSchema';
@@ -34,6 +35,25 @@ class ProductController {
     );
 
     return res.json(products);
+  }
+
+  async show(req: Request<{ id: string }>, res: Response) {
+    const { id } = req.params;
+
+    if (!validateUUID(id)) {
+      return res.status(404).json({ error: 'Product not found' });
+    }
+
+    const product = await ProductRepository.findById(id);
+
+    if (!product) {
+      return res.status(404).json({ error: 'Product not found' });
+    }
+
+    return res.json({
+      ...product,
+      createdAt: undefined,
+    });
   }
 
   async store(req: Request, res: Response) {
