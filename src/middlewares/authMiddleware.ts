@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { JwtPayload } from 'jsonwebtoken';
+import { validate as validateUUID } from 'uuid';
 
 import UserRepository from '@repositories/UserRepository';
 import Token from '@helpers/Token';
@@ -29,7 +30,12 @@ function getAuthHeaderToken(req: Request) {
 }
 
 function isValidPayload(payload: any): asserts payload is Payload {
-  if (!(typeof payload === 'object' && 'sub' in payload && typeof payload.sub === 'string')) {
+  if (
+    !(typeof payload === 'object'
+      && 'sub' in payload
+      && typeof payload.sub === 'string'
+      && validateUUID(payload.sub))
+  ) {
     throw new Error('Payload invalid');
   }
 }
